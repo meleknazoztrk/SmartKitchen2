@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartKitchen.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Colors -->
+            <Color x:Key="BgDark">#121212</Color>
+            <Color x:Key="CardDark">#1E1E1E</Color>
+            <Color x:Key="NeonGreen">#00FF88</Color>
+            <Color x:Key="NeonGreenTransparent">#3300FF88</Color>
+            <Color x:Key="TextLight">#FFFFFF</Color>
+            <Color x:Key="TextMuted">#A0A0A0</Color>
+
+            <Style TargetType="Page">
+                <Setter Property="BackgroundColor" Value="{StaticResource BgDark}" />
+            </Style>
+
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextLight}" />
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="TextColor" Value="{StaticResource BgDark}" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Padding" Value="14,10" />
+            </Style>
+
+            <Style TargetType="SearchBar">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardDark}" />
+                <Setter Property="TextColor" Value="{StaticResource TextLight}" />
+                <Setter Property="CancelButtonColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+            </Style>
+
+            <Style TargetType="Picker">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardDark}" />
+                <Setter Property="TextColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="TitleColor" Value="{StaticResource TextMuted}" />
+            </Style>
+
+            <Style TargetType="Border">
+                <Setter Property="StrokeShape" Value="RoundRectangle 20" />
+                <Setter Property="Stroke" Value="{StaticResource NeonGreenTransparent}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource CardDark}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

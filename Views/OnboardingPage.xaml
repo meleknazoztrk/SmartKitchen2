@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartKitchen.ViewModels"
+             x:Class="SmartKitchen.Views.OnboardingPage"
+             Title="Hoş Geldiniz"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="20">
+        
+        <!-- 3 Sütunlu Ana Alan: Sol Ok | Carousel | Sağ Ok -->
+        <Grid Grid.Row="0" ColumnDefinitions="60,*,60">
+
+            <!-- Sol Ok -->
+            <Button Grid.Column="0" Text="&lt;" Command="{Binding PreviousCommand}"
+                    TextColor="#00FF88" BackgroundColor="Transparent"
+                    FontSize="30" FontAttributes="Bold"
+                    HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <!-- Carousel (orta sütun) -->
+            <CarouselView Grid.Column="1"
+                          ItemsSource="{Binding Items}"
+                          Position="{Binding CurrentPosition}"
+                          Loop="False"
+                          IndicatorView="indicatorView">
+                <CarouselView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:OnboardingItem">
+                        <ScrollView>
+                            <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
+                                <StackLayout VerticalOptions="Center" HorizontalOptions="Center"
+                                             Spacing="16" Padding="10">
+                                    <Label Text="{Binding ImageUrl}"
+                                           FontSize="90"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Text="{Binding Title}"
+                                           FontSize="22" FontAttributes="Bold"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource NeonGreen}" />
+                                    <Label Text="{Binding Description}"
+                                           FontSize="15"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="{StaticResource TextMuted}"
+                                           LineBreakMode="WordWrap"
+                                           Margin="10,0" />
+                                </StackLayout>
+                            </Grid>
+                        </ScrollView>
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+            </CarouselView>
+
+            <!-- Sağ Ok -->
+            <Button Grid.Column="2" Text="&gt;" Command="{Binding NextCommand}"
+                    TextColor="#00FF88" BackgroundColor="Transparent"
+                    FontSize="30" FontAttributes="Bold"
+                    HorizontalOptions="Center" VerticalOptions="Center" />
+
+        </Grid>
+
+
+        <IndicatorView x:Name="indicatorView" Grid.Row="1" IndicatorColor="{StaticResource TextMuted}" SelectedIndicatorColor="{StaticResource NeonGreen}" HorizontalOptions="Center" Margin="0,20" />
+
+        <Button Grid.Row="2" Text="Hadi Başlayalım" Command="{Binding StartAppCommand}" Margin="0,20,0,30" />
+        
+    </Grid>
+
+</ContentPage>

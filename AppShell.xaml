@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="SmartKitchen.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:SmartKitchen.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarBackgroundColor="{StaticResource BgDark}"
+    Shell.TabBarTitleColor="{StaticResource TextMuted}"
+    Shell.TabBarUnselectedColor="{StaticResource TextMuted}">
+
+    <TabBar>
+        <Tab Title="Dolabım" Icon="home.png">
+            <ShellContent Route="FridgePage" ContentTemplate="{DataTemplate local:FridgePage}" />
+        </Tab>
+        <Tab Title="Keşfet" Icon="search.png">
+            <ShellContent Route="RecipeListPage" ContentTemplate="{DataTemplate local:RecipeListPage}" />
+        </Tab>
+    </TabBar>
+
+</Shell>

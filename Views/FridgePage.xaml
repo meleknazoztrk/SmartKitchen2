@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartKitchen.ViewModels"
+             xmlns:models="clr-namespace:SmartKitchen.Models"
+             x:Class="SmartKitchen.Views.FridgePage"
+             Title="Dolabım">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="15" RowSpacing="15">
+        
+        <!-- Header: Search and Add -->
+        <Grid Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <SearchBar Grid.Column="0" 
+                       Placeholder="Malzeme ara..." 
+                       Text="{Binding SearchText}" />
+            <Button Grid.Column="1" 
+                    Text="+" 
+                    WidthRequest="50" 
+                    HeightRequest="50"
+                    Command="{Binding AddNewIngredientCommand}" />
+        </Grid>
+
+        <!-- Available Ingredients -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding AvailableIngredients}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="3" VerticalItemSpacing="10" HorizontalItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Ingredient">
+                    <Border StrokeShape="RoundRectangle 15" StrokeThickness="1">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FridgeViewModel}}, Path=SelectIngredientCommand}" CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <StackLayout Padding="10" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding IconUrl}" FontSize="32" HorizontalOptions="Center" />
+                            <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,5,0,0" />
+                        </StackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Selected Ingredients (Basket) -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" RowSpacing="15">
+            <Label Grid.Row="0" Text="Sepetim" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource NeonGreen}" />
+            
+            <CollectionView Grid.Row="0" ItemsSource="{Binding SelectedIngredients}" HeightRequest="60" Margin="80,0,0,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Ingredient">
+                        <Border StrokeShape="RoundRectangle 30" StrokeThickness="1" BackgroundColor="{StaticResource NeonGreenTransparent}" WidthRequest="50" HeightRequest="50">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FridgeViewModel}}, Path=RemoveIngredientCommand}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding IconUrl}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+        
+    </Grid>
+
+</ContentPage>

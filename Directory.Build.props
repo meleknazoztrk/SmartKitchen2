@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>C:\temp\SmartKitchen\obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>C:\temp\SmartKitchen\bin\</BaseOutputPath>
+  </PropertyGroup>
+</Project>

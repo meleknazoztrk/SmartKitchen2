@@ -18,44 +18,82 @@ public partial class OnboardingItem : ObservableObject
 
 public partial class OnboardingViewModel : ObservableObject
 {
+    private readonly List<OnboardingItem> _items;
+
+    public OnboardingViewModel()
+    {
+        _items = new List<OnboardingItem>
+        {
+            new OnboardingItem
+            {
+                Title = "SmartKitchen'a Hoş Geldiniz",
+                Description = "Evdeki malzemelerle harikalar yaratmaya hazır mısınız?",
+                ImageUrl = "👨‍🍳"
+            },
+            new OnboardingItem
+            {
+                Title = "Malzemelerinizi Seçin",
+                Description = "Dolabınızdaki malzemeleri seçin, biz size en uygun tarifleri bulalım.",
+                ImageUrl = "🛒"
+            },
+            new OnboardingItem
+            {
+                Title = "Akıllı Eşleşme",
+                Description = "Dünya mutfaklarından yüzlerce tarif arasından size özel önerileri keşfedin.",
+                ImageUrl = "✨"
+            }
+        };
+
+        UpdateCurrentItem();
+    }
+
     [ObservableProperty]
-    private ObservableCollection<OnboardingItem> items = new();
+    private string currentEmoji = string.Empty;
+
+    [ObservableProperty]
+    private string currentTitle = string.Empty;
+
+    [ObservableProperty]
+    private string currentDescription = string.Empty;
 
     [ObservableProperty]
     private int currentPosition = 0;
 
+    // Nokta göstergeleri için renkler
+    [ObservableProperty] private string dot0Color = "#00FF88";
+    [ObservableProperty] private string dot1Color = "#444444";
+    [ObservableProperty] private string dot2Color = "#444444";
+
     [RelayCommand]
     private void Next()
     {
-        if (CurrentPosition < 2) CurrentPosition++;
+        if (CurrentPosition < _items.Count - 1)
+        {
+            CurrentPosition++;
+            UpdateCurrentItem();
+        }
     }
 
     [RelayCommand]
     private void Previous()
     {
-        if (CurrentPosition > 0) CurrentPosition--;
+        if (CurrentPosition > 0)
+        {
+            CurrentPosition--;
+            UpdateCurrentItem();
+        }
     }
 
-    public OnboardingViewModel()
+    private void UpdateCurrentItem()
     {
-        Items.Add(new OnboardingItem
-        {
-            Title = "SmartKitchen'a Hoş Geldiniz",
-            Description = "Evdeki malzemelerle harikalar yaratmaya hazır mısınız?",
-            ImageUrl = "👨‍🍳"
-        });
-        Items.Add(new OnboardingItem
-        {
-            Title = "Malzemelerinizi Seçin",
-            Description = "Dolabınızdaki malzemeleri seçin, biz size en uygun tarifleri bulalım.",
-            ImageUrl = "🛒"
-        });
-        Items.Add(new OnboardingItem
-        {
-            Title = "Akıllı Eşleşme",
-            Description = "Dünya mutfaklarından yüzlerce tarif arasından size özel önerileri keşfedin.",
-            ImageUrl = "✨"
-        });
+        var item = _items[CurrentPosition];
+        CurrentEmoji = item.ImageUrl;
+        CurrentTitle = item.Title;
+        CurrentDescription = item.Description;
+
+        Dot0Color = CurrentPosition == 0 ? "#00FF88" : "#444444";
+        Dot1Color = CurrentPosition == 1 ? "#00FF88" : "#444444";
+        Dot2Color = CurrentPosition == 2 ? "#00FF88" : "#444444";
     }
 
     [RelayCommand]

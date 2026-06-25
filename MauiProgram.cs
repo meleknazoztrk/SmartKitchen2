@@ -20,7 +20,7 @@ public static class MauiProgram
             });
 
         // Services
-        builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddSingleton<FirebaseService>();
         builder.Services.AddSingleton<RecipeService>();
 
         // ViewModels
@@ -38,6 +38,8 @@ public static class MauiProgram
         builder.Services.AddTransient<RecipeDetailPage>();
         builder.Services.AddTransient<AuthPage>();
         builder.Services.AddTransient<ProfilePage>();
+        builder.Services.AddTransient<SmartKitchen.ViewModels.AddRecipePageViewModel>();
+        builder.Services.AddTransient<SmartKitchen.Views.AddRecipePage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

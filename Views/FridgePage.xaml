@@ -4,64 +4,176 @@
              xmlns:viewmodels="clr-namespace:SmartKitchen.ViewModels"
              xmlns:models="clr-namespace:SmartKitchen.Models"
              x:Class="SmartKitchen.Views.FridgePage"
-             Title="Dolabım">
+             Title="Dolabım"
+             BackgroundColor="#121212">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="15" RowSpacing="15">
+    <Grid>
+        <Grid RowDefinitions="Auto, *, Auto" Padding="15" RowSpacing="15">
         
         <!-- Header: Search and Add -->
-        <Grid Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-            <SearchBar Grid.Column="0" 
-                       Placeholder="Malzeme ara..." 
-                       Text="{Binding SearchText}" />
+        <Grid Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+            <Frame Grid.Column="0" BackgroundColor="#1E1E1E" CornerRadius="12" BorderColor="#333333" Padding="0">
+                <SearchBar Placeholder="Malzeme ara..." 
+                           Text="{Binding SearchText}" 
+                           PlaceholderColor="#888888" 
+                           TextColor="#FFFFFF" 
+                           CancelButtonColor="{DynamicResource PrimaryColor}"/>
+            </Frame>
             <Button Grid.Column="1" 
                     Text="+" 
                     WidthRequest="50" 
                     HeightRequest="50"
+                    BackgroundColor="{DynamicResource PrimaryColor}"
+                    TextColor="#121212"
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    CornerRadius="12"
                     Command="{Binding AddNewIngredientCommand}" />
         </Grid>
 
         <!-- Available Ingredients -->
-        <CollectionView Grid.Row="1" ItemsSource="{Binding AvailableIngredients}">
+        <CollectionView Grid.Row="1" ItemsSource="{Binding AvailableIngredients}" SelectionMode="None">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="3" VerticalItemSpacing="10" HorizontalItemSpacing="10" />
+                <GridItemsLayout Orientation="Vertical" Span="2" VerticalItemSpacing="10" HorizontalItemSpacing="10" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Ingredient">
-                    <Border StrokeShape="RoundRectangle 15" StrokeThickness="1">
+                <DataTemplate>
+                    <Border StrokeShape="RoundRectangle 15" StrokeThickness="2" BackgroundColor="#1E1E1E">
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FridgeViewModel}}, Path=SelectIngredientCommand}" CommandParameter="{Binding .}" />
+                            <TapGestureRecognizer Tapped="OnIngredientTapped" />
                         </Border.GestureRecognizers>
-                        <StackLayout Padding="10" HorizontalOptions="Center" VerticalOptions="Center">
-                            <Label Text="{Binding IconUrl}" FontSize="32" HorizontalOptions="Center" />
-                            <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,5,0,0" />
-                        </StackLayout>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Stroke" Value="{DynamicResource PrimaryColor}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="False">
+                                <Setter Property="Stroke" Value="#333333" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Grid ColumnDefinitions="Auto, *" Padding="10">
+                            <Label Grid.Column="0" 
+                                   Text="{Binding Ingredient.IconUrl}" 
+                                   FontSize="24" 
+                                   VerticalOptions="Center" 
+                                   Margin="5,0"/>
+                            <Label Grid.Column="1" 
+                                   Text="{Binding Ingredient.Name}" 
+                                   FontSize="14" 
+                                   TextColor="#FFFFFF"
+                                   VerticalOptions="Center" 
+                                   LineBreakMode="TailTruncation"
+                                   Margin="5,0"/>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Selected Ingredients (Basket) -->
-        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" RowSpacing="15">
-            <Label Grid.Row="0" Text="Sepetim" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource NeonGreen}" />
-            
-            <CollectionView Grid.Row="0" ItemsSource="{Binding SelectedIngredients}" HeightRequest="60" Margin="80,0,0,0">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Ingredient">
-                        <Border StrokeShape="RoundRectangle 30" StrokeThickness="1" BackgroundColor="{StaticResource NeonGreenTransparent}" WidthRequest="50" HeightRequest="50">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FridgeViewModel}}, Path=RemoveIngredientCommand}" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <Label Text="{Binding IconUrl}" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+        <!-- Bottom Bar: Shopping Cart -->
+        <Border Grid.Row="2" BackgroundColor="#1E1E1E" Stroke="#333333" StrokeThickness="1" StrokeShape="RoundRectangle 20" Padding="15" Margin="0,10,0,0">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <!-- Cart Icon & Count -->
+                <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="10" x:Name="CartIconContainer">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenCartPopupCommand}" />
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="🛒" FontSize="24" VerticalOptions="Center" />
+                    <Label Text="{Binding CartCount, StringFormat='Sepettekiler: {0}'}" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF" VerticalOptions="Center" />
+                </StackLayout>
 
-        </Grid>
+                <!-- Clear Cart Button -->
+                <Button Grid.Column="2" 
+                        Text="Tümünü Bırak" 
+                        Command="{Binding ClearCartCommand}" 
+                        BackgroundColor="#FF3B30" 
+                        TextColor="#FFFFFF" 
+                        CornerRadius="8" 
+                        FontAttributes="Bold" 
+                        HeightRequest="40" 
+                        Padding="15,0" />
+            </Grid>
+        </Border>
         
+        </Grid>
+
+        <!-- Sepet Popup Overlay -->
+        <Grid IsVisible="{Binding IsCartPopupVisible}" BackgroundColor="#99000000" ZIndex="200">
+            <Border BackgroundColor="#1E1E1E" Stroke="{DynamicResource PrimaryColor}" StrokeThickness="2" StrokeShape="RoundRectangle 20" 
+                    WidthRequest="340" HeightRequest="450" HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="15">
+                    <Label Grid.Row="0" Text="Sepetim" FontSize="24" FontAttributes="Bold" TextColor="{DynamicResource PrimaryColor}" HorizontalOptions="Center" />
+                    
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding ShoppingCartList}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto, *, Auto" Padding="10,5">
+                                    <Label Grid.Column="0" Text="{Binding IconUrl}" FontSize="24" VerticalOptions="Center" Margin="0,0,10,0"/>
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="16" TextColor="#FFFFFF" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+                                    <ImageButton Grid.Column="2" 
+                                                  
+                                                 BackgroundColor="Transparent"
+                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:FridgeViewModel}}, Path=RemoveFromCartCommand}"
+                                                 CommandParameter="{Binding .}"
+                                                 VerticalOptions="Center"
+                                                 HeightRequest="30"
+                                                 WidthRequest="30">
+                                        <!-- Fallback to a text X if FontAwesome is missing -->
+                                        <ImageButton.Source>
+                                            <FontImageSource Glyph="✖" Color="#FF3B30" Size="20" />
+                                        </ImageButton.Source>
+                                    </ImageButton>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Grid.Row="2" Text="Kapat" Command="{Binding CloseCartPopupCommand}" BackgroundColor="#333333" TextColor="#FFFFFF" CornerRadius="10" FontAttributes="Bold" HeightRequest="45" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid IsVisible="{Binding IsEmojiPickerVisible}" BackgroundColor="#99000000" ZIndex="100">
+            <Border BackgroundColor="#1E1E1E" Stroke="{DynamicResource PrimaryColor}" StrokeThickness="2" StrokeShape="RoundRectangle 20" 
+                    WidthRequest="320" HeightRequest="450" HorizontalOptions="Center" VerticalOptions="Center" Padding="20">
+                <Grid RowDefinitions="Auto, *, Auto" RowSpacing="15">
+                    <Label Grid.Row="0" Text="Bir Emoji Seçin" FontSize="20" FontAttributes="Bold" TextColor="#FFFFFF" HorizontalOptions="Center" />
+                    
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding AvailableEmojis}" SelectionMode="Single" SelectedItem="{Binding SelectedEmoji}">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="5" HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeThickness="2" StrokeShape="RoundRectangle 10" Padding="0" WidthRequest="50" HeightRequest="50" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Stroke" Value="Transparent" />
+                                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Stroke" Value="{DynamicResource PrimaryColor}" />
+                                                    <Setter Property="BackgroundColor" Value="#1100FF88" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Label Text="{Binding .}" FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="15">
+                        <Button Grid.Column="0" Text="Geç (❓)" Command="{Binding SkipEmojiCommand}" BackgroundColor="#333333" TextColor="#FFFFFF" CornerRadius="10" FontAttributes="Bold" />
+                        <Button Grid.Column="1" Text="Seç" Command="{Binding ConfirmEmojiCommand}" BackgroundColor="{DynamicResource PrimaryColor}" TextColor="#121212" CornerRadius="10" FontAttributes="Bold" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 
 </ContentPage>

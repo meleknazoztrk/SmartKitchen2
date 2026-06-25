@@ -7,7 +7,9 @@
             <!-- Colors -->
             <Color x:Key="BgDark">#121212</Color>
             <Color x:Key="CardDark">#1E1E1E</Color>
+            <Color x:Key="BgCard">#1E1E1E</Color>
             <Color x:Key="NeonGreen">#00FF88</Color>
+            <Color x:Key="PrimaryColor">#00FF88</Color>
             <Color x:Key="NeonGreenTransparent">#3300FF88</Color>
             <Color x:Key="TextLight">#FFFFFF</Color>
             <Color x:Key="TextMuted">#A0A0A0</Color>
@@ -21,7 +23,7 @@
             </Style>
 
             <Style TargetType="Button">
-                <Setter Property="BackgroundColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryColor}" />
                 <Setter Property="TextColor" Value="{StaticResource BgDark}" />
                 <Setter Property="CornerRadius" Value="20" />
                 <Setter Property="FontAttributes" Value="Bold" />
@@ -31,13 +33,13 @@
             <Style TargetType="SearchBar">
                 <Setter Property="BackgroundColor" Value="{StaticResource CardDark}" />
                 <Setter Property="TextColor" Value="{StaticResource TextLight}" />
-                <Setter Property="CancelButtonColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="CancelButtonColor" Value="{DynamicResource PrimaryColor}" />
                 <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
             </Style>
 
             <Style TargetType="Picker">
                 <Setter Property="BackgroundColor" Value="{StaticResource CardDark}" />
-                <Setter Property="TextColor" Value="{StaticResource NeonGreen}" />
+                <Setter Property="TextColor" Value="{DynamicResource PrimaryColor}" />
                 <Setter Property="TitleColor" Value="{StaticResource TextMuted}" />
             </Style>
 

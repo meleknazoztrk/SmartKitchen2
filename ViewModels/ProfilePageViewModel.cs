@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SmartKitchen.Data;
+using SmartKitchen.Services;
 using SmartKitchen.Models;
 using System.Collections.ObjectModel;
 
@@ -8,11 +8,11 @@ namespace SmartKitchen.ViewModels;
 
 public partial class ProfilePageViewModel : ObservableObject
 {
-    private readonly DatabaseService _databaseService;
+    private readonly FirebaseService _firebaseService;
 
-    public ProfilePageViewModel(DatabaseService databaseService)
+    public ProfilePageViewModel(FirebaseService firebaseService)
     {
-        _databaseService = databaseService;
+        _firebaseService = firebaseService;
     }
 
     [ObservableProperty]
@@ -33,12 +33,21 @@ public partial class ProfilePageViewModel : ObservableObject
 
     public bool HasNoRecipes => !HasRecipes;
 
+    [ObservableProperty]
+    private ObservableCollection<Ingredient> myIngredients = new();
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasNoIngredients))]
+    private bool hasIngredients = false;
+
+    public bool HasNoIngredients => !HasIngredients;
+
     public async Task InitializeAsync()
     {
         var currentUsername = Preferences.Get("CurrentUsername", string.Empty);
         if (string.IsNullOrWhiteSpace(currentUsername)) return;
 
-        var user = await _databaseService.GetUserByUsernameAsync(currentUsername);
+        var user = await _firebaseService.GetUserByUsernameAsync(currentUsername);
         if (user != null)
         {
             Username = user.Username;
@@ -46,12 +55,23 @@ public partial class ProfilePageViewModel : ObservableObject
             Password = new string('•', user.Password.Length); // gizlenmiş gösterim
         }
 
-        var recipes = await _databaseService.GetRecipesByUserIdAsync(currentUsername);
+        var recipes = await _firebaseService.GetRecipesByUserIdAsync(currentUsername);
         MyRecipes.Clear();
         foreach (var r in recipes)
             MyRecipes.Add(r);
 
         HasRecipes = MyRecipes.Count > 0;
+
+        var allIngredients = await _firebaseService.GetIngredientsAsync();
+        MyIngredients.Clear();
+        foreach (var i in allIngredients)
+        {
+            if (i.UserId == currentUsername && !string.IsNullOrEmpty(currentUsername))
+            {
+                MyIngredients.Add(i);
+            }
+        }
+        HasIngredients = MyIngredients.Count > 0;
     }
 
     [RelayCommand]
@@ -66,5 +86,42 @@ public partial class ProfilePageViewModel : ObservableObject
         Preferences.Set("IsLoggedIn", false);
         Preferences.Set("CurrentUsername", string.Empty);
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task DeleteRecipeAsync(Recipe recipe)
+    {
+        if (recipe == null) return;
+
+        bool confirm = await Shell.Current.DisplayAlert("Emin misiniz?", "Bu tarifi silmek istediğinize emin misiniz?", "Evet", "Hayır");
+        if (confirm)
+        {
+            await _firebaseService.DeleteRecipeAsync(recipe);
+            MyRecipes.Remove(recipe);
+            HasRecipes = MyRecipes.Count > 0;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteIngredientAsync(Ingredient ingredient)
+    {
+        if (ingredient == null) return;
+
+        bool confirm = await Shell.Current.DisplayAlert("Emin misiniz?", "Bu malzemeyi silmek istediğinize emin misiniz?", "Evet", "Hayır");
+        if (confirm)
+        {
+            await _firebaseService.DeleteIngredientAsync(ingredient);
+            MyIngredients.Remove(ingredient);
+            HasIngredients = MyIngredients.Count > 0;
+        }
+    }
+
+    [RelayCommand]
+    private void ChangeTheme(string hexColor)
+    {
+        if (string.IsNullOrEmpty(hexColor)) return;
+        
+        Application.Current.Resources["PrimaryColor"] = Color.FromArgb(hexColor);
+        Preferences.Set("SelectedThemeColor", hexColor);
     }
 }

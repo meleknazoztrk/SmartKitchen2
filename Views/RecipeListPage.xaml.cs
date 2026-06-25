@@ -16,6 +16,7 @@ public partial class RecipeListPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        await Task.Delay(500);
+        await _viewModel.LoadDataAsync();
     }
 }

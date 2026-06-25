@@ -1,70 +1,106 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewmodels="clr-namespace:SmartKitchen.ViewModels"
              x:Class="SmartKitchen.Views.OnboardingPage"
-             Title="Hoş Geldiniz"
-             Shell.NavBarIsVisible="False">
+             Title=""
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#121212">
 
-    <Grid RowDefinitions="*,Auto,Auto" Padding="20">
-        
-        <!-- 3 Sütunlu Ana Alan: Sol Ok | Carousel | Sağ Ok -->
-        <Grid Grid.Row="0" ColumnDefinitions="60,*,60">
+    <Grid RowDefinitions="*,Auto,Auto" Padding="0">
+
+        <!-- Orta Alan: Sol Ok | İçerik | Sağ Ok -->
+        <Grid Grid.Row="0" ColumnDefinitions="64,*,64">
 
             <!-- Sol Ok -->
-            <Button Grid.Column="0" Text="&lt;" Command="{Binding PreviousCommand}"
-                    TextColor="#00FF88" BackgroundColor="Transparent"
-                    FontSize="30" FontAttributes="Bold"
-                    HorizontalOptions="Center" VerticalOptions="Center" />
+            <Button Grid.Column="0"
+                    Text="‹"
+                    Command="{Binding PreviousCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource PrimaryColor}"
+                    FontSize="42"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Padding="0"
+                    Margin="0" />
 
-            <!-- Carousel (orta sütun) -->
-            <CarouselView Grid.Column="1"
-                          ItemsSource="{Binding Items}"
-                          Position="{Binding CurrentPosition}"
-                          Loop="False"
-                          IndicatorView="indicatorView">
-                <CarouselView.ItemTemplate>
-                    <DataTemplate x:DataType="viewmodels:OnboardingItem">
-                        <ScrollView>
-                            <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
-                                <StackLayout VerticalOptions="Center" HorizontalOptions="Center"
-                                             Spacing="16" Padding="10">
-                                    <Label Text="{Binding ImageUrl}"
-                                           FontSize="90"
-                                           HorizontalOptions="Center"
-                                           HorizontalTextAlignment="Center" />
-                                    <Label Text="{Binding Title}"
-                                           FontSize="22" FontAttributes="Bold"
-                                           HorizontalOptions="Center"
-                                           HorizontalTextAlignment="Center"
-                                           TextColor="{StaticResource NeonGreen}" />
-                                    <Label Text="{Binding Description}"
-                                           FontSize="15"
-                                           HorizontalOptions="Center"
-                                           HorizontalTextAlignment="Center"
-                                           TextColor="{StaticResource TextMuted}"
-                                           LineBreakMode="WordWrap"
-                                           Margin="10,0" />
-                                </StackLayout>
-                            </Grid>
-                        </ScrollView>
-                    </DataTemplate>
-                </CarouselView.ItemTemplate>
-            </CarouselView>
+            <!-- İçerik Alanı -->
+            <StackLayout Grid.Column="1"
+                         VerticalOptions="Center"
+                         HorizontalOptions="Center"
+                         Spacing="24"
+                         Padding="10,40">
+
+                <!-- Emoji -->
+                <Label Text="{Binding CurrentEmoji}"
+                       FontSize="96"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       VerticalOptions="Center" />
+
+                <!-- Başlık -->
+                <Label Text="{Binding CurrentTitle}"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource PrimaryColor}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+
+                <!-- Açıklama -->
+                <Label Text="{Binding CurrentDescription}"
+                       FontSize="15"
+                       TextColor="#A0A0A0"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap"
+                       Margin="10,0" />
+
+            </StackLayout>
 
             <!-- Sağ Ok -->
-            <Button Grid.Column="2" Text="&gt;" Command="{Binding NextCommand}"
-                    TextColor="#00FF88" BackgroundColor="Transparent"
-                    FontSize="30" FontAttributes="Bold"
-                    HorizontalOptions="Center" VerticalOptions="Center" />
+            <Button Grid.Column="2"
+                    Text="›"
+                    Command="{Binding NextCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource PrimaryColor}"
+                    FontSize="42"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Padding="0"
+                    Margin="0" />
 
         </Grid>
 
+        <!-- Nokta Göstergesi -->
+        <HorizontalStackLayout Grid.Row="1"
+                               HorizontalOptions="Center"
+                               Spacing="10"
+                               Margin="0,10">
+            <BoxView WidthRequest="10" HeightRequest="10"
+                     CornerRadius="5"
+                     Color="{Binding Dot0Color}" />
+            <BoxView WidthRequest="10" HeightRequest="10"
+                     CornerRadius="5"
+                     Color="{Binding Dot1Color}" />
+            <BoxView WidthRequest="10" HeightRequest="10"
+                     CornerRadius="5"
+                     Color="{Binding Dot2Color}" />
+        </HorizontalStackLayout>
 
-        <IndicatorView x:Name="indicatorView" Grid.Row="1" IndicatorColor="{StaticResource TextMuted}" SelectedIndicatorColor="{StaticResource NeonGreen}" HorizontalOptions="Center" Margin="0,20" />
+        <!-- Başlat Butonu -->
+        <Button Grid.Row="2"
+                Text="Hadi Başlayalım 🚀"
+                Command="{Binding StartAppCommand}"
+                BackgroundColor="{DynamicResource PrimaryColor}"
+                TextColor="#121212"
+                FontAttributes="Bold"
+                FontSize="17"
+                CornerRadius="18"
+                HeightRequest="54"
+                Margin="30,10,30,40" />
 
-        <Button Grid.Row="2" Text="Hadi Başlayalım" Command="{Binding StartAppCommand}" Margin="0,20,0,30" />
-        
     </Grid>
 
 </ContentPage>

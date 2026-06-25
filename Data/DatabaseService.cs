@@ -39,7 +39,7 @@ public partial class DatabaseService
     public async Task<List<Ingredient>> GetIngredientsAsync()
     {
         await Init();
-        return await _database.Table<Ingredient>().ToListAsync();
+        return await _database.Table<Ingredient>().Where(i => !i.IsDeleted).ToListAsync();
     }
 
     public async Task<int> SaveIngredientAsync(Ingredient item)
@@ -182,7 +182,6 @@ public partial class DatabaseService
             new Ingredient { Name = "Turşu", Category = "Sebze", IconUrl = "🥒" },
             new Ingredient { Name = "Hardal", Category = "Sos", IconUrl = "🏺" },
             new Ingredient { Name = "Ketçap", Category = "Sos", IconUrl = "🍅" },
-            new Ingredient { Name = "Sıcak Su", Category = "Diğer", IconUrl = "💧" },
             new Ingredient { Name = "Kuşüzümü", Category = "Kuruyemiş", IconUrl = "🍇" },
             new Ingredient { Name = "Fıstık", Category = "Kuruyemiş", IconUrl = "🥜" },
             new Ingredient { Name = "Sarımsak Tozu", Category = "Baharat", IconUrl = "🧄" },

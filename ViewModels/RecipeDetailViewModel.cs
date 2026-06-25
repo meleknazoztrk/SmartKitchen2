@@ -17,11 +17,11 @@ public partial class RecipeDetailViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<RecipeIngredientDisplay> ingredientsList = new();
 
-    private readonly SmartKitchen.Data.DatabaseService _databaseService;
+    private readonly SmartKitchen.Services.FirebaseService _firebaseService;
 
-    public RecipeDetailViewModel(SmartKitchen.Data.DatabaseService databaseService)
+    public RecipeDetailViewModel(SmartKitchen.Services.FirebaseService firebaseService)
     {
-        _databaseService = databaseService;
+        _firebaseService = firebaseService;
     }
 
     public async void Initialize()
@@ -29,33 +29,40 @@ public partial class RecipeDetailViewModel : ObservableObject
         if (AppState.SelectedRecipe != null)
         {
             Recipe = AppState.SelectedRecipe;
-            try
+            Instructions.Clear();
+            if (Recipe.Steps != null && Recipe.Steps.Count > 0)
             {
-                var steps = JsonConvert.DeserializeObject<List<string>>(Recipe.Instructions);
-                Instructions.Clear();
-                if (steps != null)
+                foreach (var step in Recipe.Steps)
                 {
-                    for (int i = 0; i < steps.Count; i++)
-                    {
-                        Instructions.Add($"{i + 1}. Adım: {steps[i]}");
-                    }
+                    Instructions.Add(step);
                 }
             }
-            catch
+            else if (!string.IsNullOrEmpty(Recipe.Instructions))
             {
-                // Fallback if parsing fails
-                Instructions.Clear();
-                Instructions.Add($"1. Adım: {Recipe.Instructions}");
+                try
+                {
+                    var steps = JsonConvert.DeserializeObject<List<string>>(Recipe.Instructions);
+                    if (steps != null)
+                    {
+                        for (int i = 0; i < steps.Count; i++)
+                        {
+                            Instructions.Add($"{i + 1}. Adım: {steps[i]}");
+                        }
+                    }
+                }
+                catch
+                {
+                    Instructions.Add($"1. Adım: {Recipe.Instructions}");
+                }
             }
             
             await LoadIngredientsAsync();
-
         }
     }
 
     private async Task LoadIngredientsAsync()
     {
-        var list = await _databaseService.GetRecipeIngredientsDetailedAsync(Recipe.Id);
+        var list = await _firebaseService.GetRecipeIngredientsDetailedAsync(Recipe.Id);
         IngredientsList.Clear();
         foreach(var item in list)
         {

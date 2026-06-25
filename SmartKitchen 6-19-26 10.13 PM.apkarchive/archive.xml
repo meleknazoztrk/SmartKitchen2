@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Archive>
+  <Name>SmartKitchen</Name>
+  <PackageName>com.companyname.smartkitchen</PackageName>
+  <PackageVersionCode>1</PackageVersionCode>
+  <PackageVersionName>1.0</PackageVersionName>
+  <PackageFormat>apk</PackageFormat>
+  <CreationDate>639174932288012380</CreationDate>
+  <SolutionName>SmartKitchen</SolutionName>
+  <SolutionPath>C:\smartkitchen2\SmartKitchen.slnx</SolutionPath>
+  <Status></Status>
+  <MinSdkVersion>21</MinSdkVersion>
+  <Configuration>
+    <DebugMode>false</DebugMode>
+  </Configuration>
+  <Comment />
+  <LastUsedKeystore>C:\Users\melek\AppData\Local\Xamarin\Mono for Android\Keystore\Melek\Melek.keystore</LastUsedKeystore>
+  <TimeStampingAuthority />
+  <LastInsightsUploadDate>0</LastInsightsUploadDate>
+</Archive>

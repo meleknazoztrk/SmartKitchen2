@@ -1,17 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SmartKitchen.Data;
+using SmartKitchen.Services;
 using SmartKitchen.Models;
+using System.Text.RegularExpressions;
 
 namespace SmartKitchen.ViewModels;
 
 public partial class AuthViewModel : ObservableObject
 {
-    private readonly DatabaseService _databaseService;
+    private readonly FirebaseService _firebaseService;
 
-    public AuthViewModel(DatabaseService databaseService)
+    public AuthViewModel(FirebaseService firebaseService)
     {
-        _databaseService = databaseService;
+        _firebaseService = firebaseService;
     }
 
     // --- Mod: true = Giriş Yap, false = Kaydol ---
@@ -60,76 +61,150 @@ public partial class AuthViewModel : ObservableObject
             return;
         }
 
-        var user = await _databaseService.GetUserByUsernameAsync(Username);
-
-        if (user == null)
+        try
         {
-            bool goRegister = await Shell.Current.DisplayAlert(
-                "Hesap Bulunamadı",
-                "Bu kullanıcı adıyla bir hesap bulamadık. Yeni bir hesap oluşturmak için kayıt bölümüne geçmek ister misiniz?",
-                "Kayıt Ol",
-                "İptal");
+            var user = await _firebaseService.GetUserByUsernameAsync(Username);
 
-            if (goRegister)
+            if (user == null)
             {
-                IsLoginVisible = false;
-                Username = string.Empty;
-                Email = string.Empty;
-                Password = string.Empty;
+                bool goRegister = await Shell.Current.DisplayAlert(
+                    "Hesap Bulunamadı",
+                    "Bu kullanıcı adıyla bir hesap bulamadık. Yeni bir hesap oluşturmak için kayıt bölümüne geçmek ister misiniz?",
+                    "Kayıt Ol",
+                    "İptal");
+
+                if (goRegister)
+                {
+                    IsLoginVisible = false;
+                    Username = string.Empty;
+                    Email = string.Empty;
+                    Password = string.Empty;
+                }
+                return;
             }
-            return;
-        }
 
-        if (user.Password != Password)
+            if (user.Password != Password)
+            {
+                await Shell.Current.DisplayAlert("Hata", "Şifre yanlış. Lütfen tekrar deneyin.", "Tamam");
+                return;
+            }
+            if (Username == "meleknazzx")
+            {
+                Preferences.Set("IsAdmin", true);
+            }
+            else
+            {
+                Preferences.Set("IsAdmin", false);
+            }
+
+            Preferences.Set("IsLoggedIn", true);
+            Preferences.Set("CurrentUsername", user.Username);
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Shell.Current.GoToAsync("..");
+            });
+        }
+        catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Hata", "Şifre yanlış. Lütfen tekrar deneyin.", "Tamam");
-            return;
+            await Shell.Current.DisplayAlert("Hata", $"Giriş yapılırken bir sorun oluştu: {ex.Message}", "Tamam");
         }
-
-        Preferences.Set("IsLoggedIn", true);
-        Preferences.Set("CurrentUsername", user.Username);
-        await Shell.Current.GoToAsync("..");
     }
 
     // --- Kaydol ---
     [RelayCommand]
     private async Task RegisterAsync()
     {
-        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(Email))
         {
-            await Shell.Current.DisplayAlert("Hata", "Kullanıcı adı ve şifre boş olamaz.", "Tamam");
+            await Shell.Current.DisplayAlert("Hata", "Tüm alanları doldurmanız gerekmektedir.", "Tamam");
             return;
         }
 
-        var existing = await _databaseService.GetUserByUsernameAsync(Username);
-        if (existing != null)
+        if (!Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
         {
-            await Shell.Current.DisplayAlert("Hata", "Bu kullanıcı adı zaten kullanılıyor.", "Tamam");
+            if (Application.Current?.MainPage != null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Hata", "Geçersiz e-posta formatı. Lütfen tam bir e-posta adresi girin.", "Tamam");
+            }
             return;
         }
 
-        var newUser = new User
+        try
         {
-            Username = Username,
-            Email = Email,
-            Password = Password
-        };
-        await _databaseService.SaveUserAsync(newUser);
+            bool isTaken = await _firebaseService.IsUsernameTakenAsync(Username);
+            if (isTaken)
+            {
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Hata", "Bu kullanıcı adı zaten kullanılıyor. Lütfen başka bir isim seçin.", "Tamam");
+                }
+                return;
+            }
 
-        // Kayıt başarılı → Login moduna geç, uyarı ver
-        await Shell.Current.DisplayAlert("Kayıt Başarılı!", "Lütfen giriş yapın.", "Tamam");
-        IsLoginVisible = true;
-        Username = string.Empty;
-        Email = string.Empty;
-        Password = string.Empty;
+            bool isEmailTaken = await _firebaseService.IsEmailTakenAsync(Email);
+            if (isEmailTaken)
+            {
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Hata", "Bu e-posta adresi zaten kullanılıyor.", "Tamam");
+                }
+                return;
+            }
+
+            var newUser = new User
+            {
+                Username = Username,
+                Email = Email,
+                Password = Password
+            };
+            await _firebaseService.SaveUserAsync(newUser);
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                // Kayıt başarılı → Login moduna geç, uyarı ver
+                await Shell.Current.DisplayAlert("Kayıt Başarılı!", "Lütfen giriş yapın.", "Tamam");
+                IsLoginVisible = true;
+                Username = string.Empty;
+                Email = string.Empty;
+                Password = string.Empty;
+            });
+        }
+        catch (Exception ex)
+        {
+            if (Application.Current?.MainPage != null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Hata", $"Kayıt olurken bir sorun oluştu: {ex.Message}", "Tamam");
+            }
+        }
     }
 
     // --- Misafir ---
     [RelayCommand]
     private async Task ContinueAsGuestAsync()
     {
-        Preferences.Set("IsLoggedIn", false);
-        Preferences.Set("CurrentUsername", string.Empty);
-        await Shell.Current.GoToAsync("..");
+        try
+        {
+            Preferences.Set("IsLoggedIn", false);
+            Preferences.Set("CurrentUsername", string.Empty);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting guest preferences: {ex.Message}");
+        }
+        finally
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                try
+                {
+                    await Shell.Current.GoToAsync("///FridgePage");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Guest navigation failed: {ex.Message}");
+                }
+            });
+        }
     }
 }

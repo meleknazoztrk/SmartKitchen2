@@ -9,9 +9,15 @@ public partial class App : Application
     {
         InitializeComponent();
 
-#if DEBUG
+        // 🌙 Uygulamayı telefonun ayarından bağımsız, sonsuza kadar karanlık moda kilitler!
+        Application.Current.UserAppTheme = AppTheme.Dark;
+
+#if DEBUG        
         Preferences.Clear();
 #endif
+
+        string savedColorHex = Preferences.Get("SelectedThemeColor", "#00FF88");
+        Application.Current.Resources["PrimaryColor"] = Color.FromArgb(savedColorHex);
 
         bool isFirstLaunch = Preferences.Get("IsFirstLaunch", true);
 

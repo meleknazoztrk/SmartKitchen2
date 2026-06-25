@@ -11,5 +11,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("RecipeDetailPage", typeof(RecipeDetailPage));
         Routing.RegisterRoute("AuthPage", typeof(AuthPage));
         Routing.RegisterRoute("ProfilePage", typeof(ProfilePage));
+        Routing.RegisterRoute("AddRecipePage", typeof(SmartKitchen.Views.AddRecipePage));
     }
 }

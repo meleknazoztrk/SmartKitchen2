@@ -13,7 +13,7 @@
 
             <!-- Giriş yapılmamış: Link göster -->
             <Label Text="🔑 Giriş Yap / Kaydol"
-                   TextColor="#00FF88" FontSize="13" FontAttributes="Bold"
+                   TextColor="{DynamicResource PrimaryColor}" FontSize="13" FontAttributes="Bold"
                    IsVisible="{Binding IsNotLoggedIn}"
                    HorizontalOptions="End" VerticalOptions="Center">
                 <Label.GestureRecognizers>
@@ -23,7 +23,7 @@
 
             <!-- Giriş yapılmış: Hoşgeldin göster -->
             <Label Text="{Binding CurrentUsername, StringFormat='👋 Hoşgeldin {0} ›'}"
-                   TextColor="#00FF88" FontSize="13" FontAttributes="Bold"
+                   TextColor="{DynamicResource PrimaryColor}" FontSize="13" FontAttributes="Bold"
                    IsVisible="{Binding IsLoggedIn}"
                    HorizontalOptions="End" VerticalOptions="Center">
                 <Label.GestureRecognizers>
@@ -56,8 +56,8 @@
                             
                             <!-- Match Percentage Circle -->
                             <Border Grid.Column="0" StrokeShape="RoundRectangle 35" WidthRequest="70" HeightRequest="70" 
-                                    BackgroundColor="{StaticResource BgDark}" Stroke="{StaticResource NeonGreen}" StrokeThickness="3">
-                                <Label Text="{Binding MatchPercentage, StringFormat='{0:F0}%'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource NeonGreen}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    BackgroundColor="{StaticResource BgDark}" Stroke="{DynamicResource PrimaryColor}" StrokeThickness="3">
+                                <Label Text="{Binding MatchPercentage, StringFormat='{0:F0}%'}" FontSize="18" FontAttributes="Bold" TextColor="{DynamicResource PrimaryColor}" HorizontalOptions="Center" VerticalOptions="Center" />
                             </Border>
 
                             <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
@@ -75,8 +75,18 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="3" 
+                           IsRunning="{Binding IsBusy}" 
+                           IsVisible="{Binding IsBusy}" 
+                           Color="{DynamicResource PrimaryColor}" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" 
+                           WidthRequest="50" 
+                           HeightRequest="50"/>
+
         <!-- Add Own Recipe -->
-        <Button Grid.Row="4" Text="Kendi Tarifini Ekle" Command="{Binding AddOwnRecipeCommand}" />
+        <Button Grid.Row="4" Text="Kendi Tarifini Ekle" Command="{Binding GoToAddRecipeCommand}" />
         
     </Grid>
 

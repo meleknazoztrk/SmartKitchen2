@@ -15,6 +15,9 @@ public partial class RecipeListViewModel : ObservableObject
     private ObservableCollection<RecipeMatchResult> recipes = new();
 
     [ObservableProperty]
+    private bool isBusy = false;
+
+    [ObservableProperty]
     private string searchText = string.Empty;
 
     [ObservableProperty]
@@ -40,11 +43,32 @@ public partial class RecipeListViewModel : ObservableObject
         _recipeService = recipeService;
     }
 
-    public async Task InitializeAsync()
+    public async Task LoadDataAsync()
     {
-        LoadAuthState();
-        _allMatches = await _recipeService.CalculateBestMatchesAsync(AppState.SelectedIngredients);
-        ApplyFilters();
+        if (IsBusy) return;
+        IsBusy = true;
+        
+        try
+        {
+            LoadAuthState();
+            _allMatches = await _recipeService.CalculateBestMatchesAsync(AppState.SelectedIngredients);
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading recipes: {ex.Message}");
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                if (Shell.Current != null)
+                {
+                    await Shell.Current.DisplayAlert("Tarif Listeleme Hatası", ex.ToString(), "Tamam");
+                }
+            });
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private void LoadAuthState()
@@ -91,18 +115,36 @@ public partial class RecipeListViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddOwnRecipeAsync()
+    private async Task GoToAddRecipeAsync()
     {
-        if (Application.Current?.MainPage != null)
+        bool isLoggedIn = Preferences.Get("IsLoggedIn", false);
+        if (isLoggedIn)
         {
-            await Application.Current.MainPage.DisplayAlert("Bilgi", "Kendi tarifini ekleme özelliği yakında gelecek!", "Tamam");
+            await Shell.Current.GoToAsync("AddRecipePage");
+        }
+        else
+        {
+            if (Application.Current?.MainPage != null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Giriş Gerekli", "Kendi tarifini eklemek için lütfen önce giriş yapmalısın.", "Tamam");
+            }
         }
     }
 
     [RelayCommand]
     private async Task GoToAuthAsync()
     {
-        await Shell.Current.GoToAsync("AuthPage");
+        try 
+        {
+            await Shell.Current.GoToAsync("AuthPage");
+        } 
+        catch (Exception ex) 
+        {
+            if (Application.Current?.MainPage != null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Hata", "Sayfa açılamadı: " + ex.Message, "Tamam");
+            }
+        }
     }
 
     [RelayCommand]

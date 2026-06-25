@@ -23,7 +23,7 @@
             <!-- Avatar / İsim -->
             <StackLayout HorizontalOptions="Center" Spacing="8" Margin="0,10,0,0">
                 <Border StrokeShape="RoundRectangle 50" WidthRequest="90" HeightRequest="90"
-                        BackgroundColor="#1A1A1A" Stroke="#00FF88" StrokeThickness="3"
+                        BackgroundColor="#1A1A1A" Stroke="{DynamicResource PrimaryColor}" StrokeThickness="3"
                         HorizontalOptions="Center">
                     <Label Text="👤" FontSize="44"
                            HorizontalOptions="Center" VerticalOptions="Center" />
@@ -71,6 +71,24 @@
                 </StackLayout>
             </Border>
 
+            <!-- Tema Seçici -->
+            <Label Text="Uygulama Teması" FontSize="18" FontAttributes="Bold"
+                   TextColor="White" Margin="0,10,0,0" />
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <StackLayout Orientation="Horizontal" Spacing="15">
+                    <Button WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#00FF88"
+                            Command="{Binding ChangeThemeCommand}" CommandParameter="#00FF88" />
+                    <Button WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#B200FF"
+                            Command="{Binding ChangeThemeCommand}" CommandParameter="#B200FF" />
+                    <Button WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#FF007F"
+                            Command="{Binding ChangeThemeCommand}" CommandParameter="#FF007F" />
+                    <Button WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#FFA500"
+                            Command="{Binding ChangeThemeCommand}" CommandParameter="#FFA500" />
+                    <Button WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#00BFFF"
+                            Command="{Binding ChangeThemeCommand}" CommandParameter="#00BFFF" />
+                </StackLayout>
+            </ScrollView>
+
             <!-- Eklediğim Tarifler -->
             <Label Text="Eklediğim Tarifler" FontSize="18" FontAttributes="Bold"
                    TextColor="White" Margin="0,10,0,0" />
@@ -89,18 +107,60 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Recipe">
                         <Border StrokeShape="RoundRectangle 14" BackgroundColor="#1C1C1C"
-                                Stroke="#00FF88" StrokeThickness="1" Padding="15">
-                            <StackLayout Spacing="4">
-                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="White" />
-                                <Label Text="{Binding Description}" FontSize="12" TextColor="{StaticResource TextMuted}"
-                                       LineBreakMode="TailTruncation" MaxLines="2" />
-                                <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="15" Margin="0,4,0,0">
-                                    <Label Grid.Column="0" Text="{Binding PrepTimeMinutes, StringFormat='⏱ {0} dk'}"
-                                           FontSize="12" TextColor="{StaticResource TextMuted}" />
-                                    <Label Grid.Column="1" Text="{Binding Calories, StringFormat='🔥 {0} kcal'}"
-                                           FontSize="12" TextColor="{StaticResource TextMuted}" />
-                                </Grid>
-                            </StackLayout>
+                                Stroke="{DynamicResource PrimaryColor}" StrokeThickness="1" Padding="15">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                                    <Label Text="{Binding Description}" FontSize="12" TextColor="{StaticResource TextMuted}"
+                                           LineBreakMode="TailTruncation" MaxLines="2" />
+                                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="15" Margin="0,4,0,0">
+                                        <Label Grid.Column="0" Text="{Binding PrepTimeMinutes, StringFormat='⏱ {0} dk'}"
+                                               FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Grid.Column="1" Text="{Binding Calories, StringFormat='🔥 {0} kcal'}"
+                                               FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    </Grid>
+                                </StackLayout>
+                                <ImageButton Grid.Column="1" BackgroundColor="Transparent" VerticalOptions="Center"
+                                             WidthRequest="40" HeightRequest="40" Padding="8"
+                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ProfilePageViewModel}}, Path=DeleteRecipeCommand}" CommandParameter="{Binding .}">
+                                    <ImageButton.Source>
+                                        <FontImageSource Glyph="🗑️" Color="#FF3B30" Size="24" />
+                                    </ImageButton.Source>
+                                </ImageButton>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Eklediğim Malzemeler -->
+            <Label Text="Eklediğim Malzemeler" FontSize="18" FontAttributes="Bold"
+                   TextColor="White" Margin="0,10,0,0" />
+
+            <Label Text="Henüz malzeme eklemediniz." FontSize="14"
+                   TextColor="{StaticResource TextMuted}"
+                   IsVisible="{Binding HasNoIngredients}"
+                   HorizontalOptions="Center" Margin="0,10" />
+
+            <CollectionView ItemsSource="{Binding MyIngredients}" IsVisible="{Binding HasIngredients}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Ingredient">
+                        <Border StrokeShape="RoundRectangle 14" BackgroundColor="#1C1C1C"
+                                Stroke="{DynamicResource PrimaryColor}" StrokeThickness="1" Padding="15">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Label Grid.Column="0" Text="{Binding IconUrl}" FontSize="24" VerticalOptions="Center" Margin="0,0,10,0" />
+                                <Label Grid.Column="1" Text="{Binding Name}" FontSize="16" TextColor="White" VerticalOptions="Center" />
+                                <ImageButton Grid.Column="2" BackgroundColor="Transparent" VerticalOptions="Center"
+                                             WidthRequest="40" HeightRequest="40" Padding="8"
+                                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ProfilePageViewModel}}, Path=DeleteIngredientCommand}" CommandParameter="{Binding .}">
+                                    <ImageButton.Source>
+                                        <FontImageSource Glyph="🗑️" Color="#FF3B30" Size="24" />
+                                    </ImageButton.Source>
+                                </ImageButton>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

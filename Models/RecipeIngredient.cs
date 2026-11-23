@@ -4,8 +4,19 @@ namespace SmartKitchen.Models;
 
 public class RecipeIngredient
 {
-    public string IngredientName { get; set; } = string.Empty;
-    public string Amount { get; set; } = string.Empty;
+    private string _ingredientName = string.Empty;
+    public string IngredientName
+    {
+        get => _ingredientName ?? string.Empty;
+        set => _ingredientName = value ?? string.Empty;
+    }
+
+    private string _amount = string.Empty;
+    public string Amount
+    {
+        get => _amount ?? string.Empty;
+        set => _amount = value ?? string.Empty;
+    }
 
     // --- Compatibility Properties ---
     [JsonIgnore]
@@ -21,7 +32,7 @@ public class RecipeIngredient
     public string Quantity
     {
         get => Amount;
-        set => Amount = value;
+        set => Amount = value ?? string.Empty;
     }
 
     [JsonIgnore]

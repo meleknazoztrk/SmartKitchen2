@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartKitchen.Models;
-using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
 namespace SmartKitchen.ViewModels;
@@ -9,10 +8,27 @@ namespace SmartKitchen.ViewModels;
 public partial class RecipeDetailViewModel : ObservableObject
 {
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPortionSize))]
+    [NotifyPropertyChangedFor(nameof(PortionSizeDisplay))]
+    [NotifyPropertyChangedFor(nameof(HasCalories))]
+    [NotifyPropertyChangedFor(nameof(CalorieDisplay))]
     private Recipe recipe = new();
 
-    [ObservableProperty]
-    private ObservableCollection<string> instructions = new();
+    public bool HasPortionSize => !string.IsNullOrWhiteSpace(Recipe?.PortionSize);
+    public string PortionSizeDisplay => !string.IsNullOrWhiteSpace(Recipe?.PortionSize) ? $"🍽️ {Recipe.PortionSize}" : string.Empty;
+
+    public bool HasCalories => !string.IsNullOrWhiteSpace(Recipe?.CaloriesPerPortion) || (Recipe != null && Recipe.Calories > 0);
+    public string CalorieDisplay
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(Recipe?.CaloriesPerPortion))
+                return $"🔥 {Recipe.CaloriesPerPortion}";
+            if (Recipe != null && Recipe.Calories > 0)
+                return $"🔥 {Recipe.Calories} kcal";
+            return string.Empty;
+        }
+    }
 
     [ObservableProperty]
     private ObservableCollection<RecipeIngredientDisplay> ingredientsList = new();
@@ -29,44 +45,67 @@ public partial class RecipeDetailViewModel : ObservableObject
         if (AppState.SelectedRecipe != null)
         {
             Recipe = AppState.SelectedRecipe;
-            Instructions.Clear();
-            if (Recipe.Steps != null && Recipe.Steps.Count > 0)
-            {
-                foreach (var step in Recipe.Steps)
-                {
-                    Instructions.Add(step);
-                }
-            }
-            else if (!string.IsNullOrEmpty(Recipe.Instructions))
-            {
-                try
-                {
-                    var steps = JsonConvert.DeserializeObject<List<string>>(Recipe.Instructions);
-                    if (steps != null)
-                    {
-                        for (int i = 0; i < steps.Count; i++)
-                        {
-                            Instructions.Add($"{i + 1}. Adım: {steps[i]}");
-                        }
-                    }
-                }
-                catch
-                {
-                    Instructions.Add($"1. Adım: {Recipe.Instructions}");
-                }
-            }
-            
             await LoadIngredientsAsync();
         }
     }
 
     private async Task LoadIngredientsAsync()
     {
-        var list = await _firebaseService.GetRecipeIngredientsDetailedAsync(Recipe.Id);
         IngredientsList.Clear();
-        foreach(var item in list)
+        if (Recipe?.Ingredients == null || Recipe.Ingredients.Count == 0) return;
+
+        List<Ingredient>? allIngredients = null;
+        try
         {
-            IngredientsList.Add(item);
+            allIngredients = await _firebaseService.GetIngredientsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Icon lookup info: {ex.Message}");
+        }
+
+        foreach (var ri in Recipe.Ingredients)
+        {
+            if (ri == null || string.IsNullOrWhiteSpace(ri.IngredientName)) continue;
+            var match = allIngredients?.FirstOrDefault(i => i != null && i.Name.Equals(ri.IngredientName, StringComparison.OrdinalIgnoreCase));
+            IngredientsList.Add(new RecipeIngredientDisplay
+            {
+                Name = ri.IngredientName,
+                Quantity = ri.Amount ?? string.Empty,
+                IconUrl = match?.IconUrl ?? "🥘"
+            });
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenYouTubeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Recipe?.Title)) return;
+        try
+        {
+            var encodedTitle = Uri.EscapeDataString(Recipe.Title.Trim()).Replace("%20", "+");
+            var url = $"https://www.youtube.com/results?search_query={encodedTitle}+tarifi";
+            await Launcher.Default.OpenAsync(new Uri(url));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"YouTube açma hatası: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenNefisYemekTarifleriAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Recipe?.Title)) return;
+        try
+        {
+            var encodedTitle = Uri.EscapeDataString(Recipe.Title.Trim()).Replace("%20", "+");
+            var url = $"https://www.nefisyemektarifleri.com/?s={encodedTitle}";
+            await Launcher.Default.OpenAsync(new Uri(url));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Nefis Yemek Tarifleri açma hatası: {ex.Message}");
         }
     }
 
@@ -75,5 +114,4 @@ public partial class RecipeDetailViewModel : ObservableObject
     {
         await Shell.Current.GoToAsync("..");
     }
-
 }

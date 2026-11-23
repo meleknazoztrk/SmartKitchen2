@@ -17,9 +17,10 @@ public class RecipeService
         var allIngredients = await _firebaseService.GetIngredientsAsync();
 
         var results = new List<RecipeMatchResult>();
-        var userIngredientNames = userIngredients
+        var userIngredientNames = userIngredients?
+            .Where(i => i != null && !string.IsNullOrWhiteSpace(i.Name))
             .Select(i => i.Name.Trim().ToLower())
-            .ToHashSet();
+            .ToHashSet() ?? new HashSet<string>();
 
         foreach (var recipe in allRecipes)
         {
@@ -29,10 +30,14 @@ public class RecipeService
 
             int matchCount = 0;
             var missingIngredients = new List<Ingredient>();
+            int totalValidIngredients = 0;
 
             foreach (var req in requiredRecipeIngredients)
             {
+                if (req == null || string.IsNullOrWhiteSpace(req.IngredientName)) continue;
+                totalValidIngredients++;
                 string reqName = req.IngredientName.Trim().ToLower();
+
                 // Check if user has this ingredient (exact or partial name match)
                 bool isMatched = userIngredientNames.Contains(reqName) || 
                                  userIngredientNames.Any(un => reqName.Contains(un) || un.Contains(reqName));
@@ -44,7 +49,7 @@ public class RecipeService
                 else
                 {
                     // Find the ingredient in allIngredients to show in missing list
-                    var ing = allIngredients.FirstOrDefault(i => i.Name.Equals(req.IngredientName, StringComparison.OrdinalIgnoreCase));
+                    var ing = allIngredients?.FirstOrDefault(i => i != null && i.Name.Equals(req.IngredientName, StringComparison.OrdinalIgnoreCase));
                     if (ing == null)
                     {
                         // Fallback: create a temporary Ingredient object so it displays correctly
@@ -54,7 +59,9 @@ public class RecipeService
                 }
             }
 
-            double matchPercentage = (double)matchCount / requiredRecipeIngredients.Count * 100.0;
+            if (totalValidIngredients == 0) continue;
+
+            double matchPercentage = (double)matchCount / totalValidIngredients * 100.0;
 
             results.Add(new RecipeMatchResult
             {

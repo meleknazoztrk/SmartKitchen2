@@ -7,19 +7,48 @@ public class Recipe
     [JsonIgnore]
     public int Id { get; set; }
 
-    public string Title { get; set; } = string.Empty;
-    public string PortionSize { get; set; } = string.Empty;
-    public string CaloriesPerPortion { get; set; } = string.Empty;
-    public List<string> Steps { get; set; } = new();
-    public List<RecipeIngredient> Ingredients { get; set; } = new();
+    private string _title = string.Empty;
+    public string Title
+    {
+        get => _title ?? string.Empty;
+        set => _title = value ?? string.Empty;
+    }
+
+    private string _portionSize = string.Empty;
+    public string PortionSize
+    {
+        get => _portionSize ?? string.Empty;
+        set => _portionSize = value ?? string.Empty;
+    }
+
+    private string _caloriesPerPortion = string.Empty;
+    public string CaloriesPerPortion
+    {
+        get => _caloriesPerPortion ?? string.Empty;
+        set => _caloriesPerPortion = value ?? string.Empty;
+    }
+
+    private List<string> _steps = new();
+    public List<string> Steps
+    {
+        get => _steps ??= new();
+        set => _steps = value ?? new();
+    }
+
+    private List<RecipeIngredient> _ingredients = new();
+    public List<RecipeIngredient> Ingredients
+    {
+        get => _ingredients ??= new();
+        set => _ingredients = value ?? new();
+    }
 
     // --- Compatibility Properties ---
     private string _description = string.Empty;
     [JsonIgnore]
     public string Description
     {
-        get => string.IsNullOrEmpty(_description) ? $"Porsiyon: {PortionSize}" : _description;
-        set => _description = value;
+        get => string.IsNullOrEmpty(_description) ? (!string.IsNullOrEmpty(PortionSize) ? $"Porsiyon: {PortionSize}" : string.Empty) : _description;
+        set => _description = value ?? string.Empty;
     }
 
     private int _calories = -1;
@@ -53,7 +82,7 @@ public class Recipe
     public string Instructions
     {
         get => string.IsNullOrEmpty(_instructions) ? JsonConvert.SerializeObject(Steps) : _instructions;
-        set => _instructions = value;
+        set => _instructions = value ?? string.Empty;
     }
 
     [JsonIgnore]

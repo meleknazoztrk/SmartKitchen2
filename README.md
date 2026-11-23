@@ -10,7 +10,7 @@
 
 ---
 
-## 📱 Proje Amacı ve Vizyonu
+##  Proje Amacı 
 
 SmartKitchen, standart ve hantal bir tarif defteri uygulamasından farklı olarak **"Eldeki malzemeyle ne pişirilir?"** karar motoruna odaklanır. Kullanıcılar dolaplarındaki mevcut malzemeleri seçer; sistem algoritmik olarak veritabanındaki tariflerle karşılaştırıp **en yüksek eşleşme yüzdesine** sahip yemekleri listeler.
 
@@ -18,20 +18,20 @@ Kullanıcıyı uzun ve karmaşık metinlerle yormak yerine; tarif detayında ana
 
 ---
 
-## ✨ Öne Çıkan Özellikler
+##  Öne Çıkan Özellikler
 
-* 🛒 **Akıllı Dolap Yönetimi:** Dolabınızda veya kilerinizdeki malzemeleri kategori ve emoji ikonlarıyla hızla seçin ve sepetinize ekleyin.
-* 🎯 **Yüzdelik Eşleşme Algoritması:** Seçtiğiniz malzemelere göre tarifleri analiz eder ve elinizdeki malzemelerle hangi yemeği % kaç oranında yapabileceğinizi hesaplar.
-* 🔍 **Eksik Malzeme Tespiti:** Seçilen tarif için hangi malzemelerin eksik olduğunu anında listeler.
-* 🚀 **Otomatik Tarif Arama & Yönlendirme:**
-  * **▶ YouTube'da İzle:** Yemeğin adıyla videolu yapılış adımlarını YouTube uygulamasında veya tarayıcıda anında açar.
-  * **📖 Nefis Yemek Tarifleri'nde Gör:** Türkiye'nin en popüler tarif platformunda ilgili yemeğin detaylarını ve püf noktalarını görüntüler.
-* ☁️ **Firebase Realtime Database:** Bulut tabanlı veri yapısı sayesinde güncel tarif kataloğu ve hızlı kullanıcı oturum yönetimi.
-* 🌙 **Modern & Akıcı Karanlık Tema:** Gözü yormayan neon yeşil vurgularla zenginleştirilmiş koyu tema (Dark Mode UI).
+ **Akıllı Dolap Yönetimi:** Dolabınızda veya kilerinizdeki malzemeleri kategori ve emoji ikonlarıyla hızla seçin ve sepetinize ekleyin.
+ **Yüzdelik Eşleşme Algoritması:** Seçtiğiniz malzemelere göre tarifleri analiz eder ve elinizdeki malzemelerle hangi yemeği % kaç oranında yapabileceğinizi hesaplar.
+ **Eksik Malzeme Tespiti:** Seçilen tarif için hangi malzemelerin eksik olduğunu anında listeler.
+ **Otomatik Tarif Arama & Yönlendirme:**
+ ** YouTube'da İzle:** Yemeğin adıyla videolu yapılış adımlarını YouTube uygulamasında veya tarayıcıda anında açar.
+ ** Nefis Yemek Tarifleri'nde Gör:** Türkiye'nin en popüler tarif platformunda ilgili yemeğin detaylarını ve püf noktalarını görüntüler.
+ **Firebase Realtime Database:** Bulut tabanlı veri yapısı sayesinde güncel tarif kataloğu ve hızlı kullanıcı oturum yönetimi.
+ **Modern & Akıcı Karanlık Tema:** Gözü yormayan neon yeşil vurgularla zenginleştirilmiş koyu tema (Dark Mode UI).
 
 ---
 
-## 📸 Ekran Görüntüleri
+## Ekran Görüntüleri
 
 | 1. Dolabım & Malzeme Seçimi | 2. Akıllı Keşfet & Eşleşme | 3. Tarif Detay & Karar Motoru |
 |:---:|:---:|:---:|
@@ -39,9 +39,9 @@ Kullanıcıyı uzun ve karmaşık metinlerle yormak yerine; tarif detayında ana
 
 ---
 
-## 📥 Uygulamayı İndir (APK)
+##  Uygulamayı İndir (APK)
 
-Uygulamanın en güncel imzalı (Signed) Android APK sürümünü doğrudan aşağıdaki bağlantıdan indirebilirsiniz:
+Uygulamanın Android APK sürümünü doğrudan aşağıdaki bağlantıdan indirebilirsiniz:
 
 👉 **[SmartKitchen Android APK İndir (v1.0.0)](https://github.com/meleknazoztrk/SmartKitchen2/releases/download/v1.0.0/com.companyname.smartkitchen.apk)**
 
@@ -49,37 +49,10 @@ Alternatif olarak [Releases](https://github.com/meleknazoztrk/SmartKitchen2/rele
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler ve Mimari
+## Kullanılan Teknolojiler ve Mimari
 
 * **Framework:** .NET MAUI (.NET 10)
 * **Tasarım Deseni:** MVVM (Model-View-ViewModel) with CommunityToolkit.Mvvm
 * **Veritabanı:** Google Firebase Realtime Database
 * **Ağ & API:** `FirebaseDatabase.net`, `System.Net.Http`, `Newtonsoft.Json`
 * **Cihaz Özellikleri:** Microsoft.Maui.ApplicationModel (`Launcher.Default.OpenAsync` ile sistem tarayıcısı entegrasyonu)
-
----
-
-## 🚀 Projeyi Yerelde Çalıştırma
-
-Projeyi bilgisayarınızda derleyip çalıştırmak için:
-
-1. **Gereksinimler:**
-   * Visual Studio 2022 (v17.10 veya üzeri) veya .NET 10 SDK
-   * ".NET Multi-platform App UI geliştirme" iş yükü
-   * Android SDK (API 34 veya üzeri)
-
-2. **Depoyu Klonlayın:**
-   ```bash
-   git clone https://github.com/meleknazoztrk/SmartKitchen2.git
-   cd SmartKitchen2
-   ```
-
-3. **Derleme & Çalıştırma:**
-   ```bash
-   dotnet build -f net10.0-android
-   ```
-
-4. **APK Çıktısı Alma:**
-   ```bash
-   dotnet publish -f net10.0-android -c Release
-   ```
